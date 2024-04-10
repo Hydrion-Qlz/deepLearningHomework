@@ -58,20 +58,20 @@ if __name__ == '__main__':
                    figure_title="Model Performance Using Mini-batch Gradient",
                    save_path="./task3/Mini-batch-Gradient.png")
 
-    # # BGD - set batch size to dataset size
-    # print("Training Model Using BGD")
-    # BGD_model = ThreeLayerModel(input_size, hidden_size, output_size)
-    # train_and_test(model=BGD_model,
-    #                batch_size=train_images.shape[0],
-    #                epochs=10,
-    #                figure_title="Model Performance Using BGD",
-    #                save_path="./task3/BGD.png")
-    #
-    # # SGD - set batch size to 1
-    # print("Training Model Using SGD")
-    # SGD_model = ThreeLayerModel(input_size, hidden_size, output_size)
-    # train_and_test(model=SGD_model,
-    #                batch_size=1,
-    #                epochs=10,
-    #                figure_title="Model Performance Using SGD",
-    #                save_path="./task3/SGD.png")
+    # BGD - set batch size to dataset size
+    print("Training Model Using BGD")
+    BGD_model = ThreeLayerModel(input_size, hidden_size, output_size)
+    train_and_test(model=BGD_model,
+                   batch_size=train_images.shape[0],
+                   epochs=10,
+                   figure_title="Model Performance Using BGD",
+                   save_path="./task3/BGD.png")
+
+    # SGD - set batch size to 1
+    print("Training Model Using SGD")
+    SGD_model = ThreeLayerModel(input_size, hidden_size, output_size)
+    train_and_test(model=SGD_model,
+                   batch_size=1,
+                   epochs=10,
+                   figure_title="Model Performance Using SGD",
+                   save_path="./task3/SGD.png")

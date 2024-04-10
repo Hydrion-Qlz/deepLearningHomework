@@ -50,29 +50,30 @@ def train_and_test(model, figure_title, save_path, batch_size=batch_size, epochs
 
 
 if __name__ == '__main__':
-    # Mini-batch Gradient - set batch size to 32
-    print("Training Model Using Mini-batch Gradient")
-    Mini_batch_gradient_model = ThreeLayerModel(input_size, hidden_size, output_size)
-    train_and_test(model=Mini_batch_gradient_model,
-                   batch_size=32,
-                   epochs=10,
-                   figure_title="Model Performance Using Mini-batch Gradient",
-                   save_path="./task3/Mini-batch-Gradient.png")
+    # Zero Initialize
+    print("Training Model Using Zero Initialize")
+    zero_initialize_model = ThreeLayerModel(input_size, hidden_size, output_size, zero_initialize)
+    train_and_test(model=zero_initialize_model,
+                   figure_title="Model Performance Using Zero Initialize",
+                   save_path="./task4/zero-initialize.png")
 
-    # BGD - set batch size to dataset size
-    print("Training Model Using BGD")
-    BGD_model = ThreeLayerModel(input_size, hidden_size, output_size)
-    train_and_test(model=BGD_model,
-                   batch_size=train_images.shape[0],
-                   epochs=10,
-                   figure_title="Model Performance Using BGD",
-                   save_path="./task3/BGD.png")
+    # Random Initialize
+    print("Training Model Using Random Initialize")
+    random_initialize_model = ThreeLayerModel(input_size, hidden_size, output_size, random_initialize)
+    train_and_test(model=random_initialize_model,
+                   figure_title="Model Performance Using Random Initialize",
+                   save_path="./task4/random-initialize.png")
 
-    # SGD - set batch size to 1
-    print("Training Model Using SGD")
-    SGD_model = ThreeLayerModel(input_size, hidden_size, output_size)
-    train_and_test(model=SGD_model,
-                   batch_size=1,
-                   epochs=10,
-                   figure_title="Model Performance Using SGD",
-                   save_path="./task3/SGD.png")
+    # Xavier Initialize
+    print("Training Model Using Xavier Initialize")
+    Xavier_initialize_model = ThreeLayerModel(input_size, hidden_size, output_size, Xavier_initialize)
+    train_and_test(model=Xavier_initialize_model,
+                   figure_title="Model Performance Using Xavier Initialize",
+                   save_path="./task4/xavier-initialize.png")
+
+    # He Initialize
+    print("Training Model Using He Initialize")
+    he_initialize_model = ThreeLayerModel(input_size, hidden_size, output_size, He_initialize)
+    train_and_test(model=he_initialize_model,
+                   figure_title="Model Performance Using He Initialize",
+                   save_path="./task4/he-initialize.png")

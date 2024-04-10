@@ -1,5 +1,5 @@
-from utils import *
 from model import *
+from utils import *
 
 train_images, train_labels = load_mnist_train()
 test_images, test_labels = load_mnist_test()
@@ -23,7 +23,7 @@ def train_and_test():
     test_loss_lst_2 = []
     train_accuracy_lst_2 = []
     test_accuracy_lst_2 = []
-    
+
     train_loss_lst_4 = []
     test_loss_lst_4 = []
     train_accuracy_lst_4 = []

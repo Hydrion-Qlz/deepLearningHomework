@@ -1,5 +1,5 @@
-from utils import *
 from model import *
+from utils import *
 
 train_images, train_labels = load_mnist_train()
 test_images, test_labels = load_mnist_test()

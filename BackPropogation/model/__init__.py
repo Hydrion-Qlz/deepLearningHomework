@@ -1,1 +1,6 @@
-from .Model import *
+from .ThreeLayerModel import ThreeLayerModel
+from .ThreeLayerModel_Momentum import ThreeLayerModel_Momentum
+from .ThreeLayerModel_RMSProp import ThreeLayerModel_RMSProp
+from .ThreeLayerModel_Adam import ThreeLayerModel_Adam
+from .FourLayerModel import FourLayerModel
+from .TwoLayerModel import TwoLayerModel

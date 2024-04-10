@@ -18,11 +18,12 @@ two_layer_model = TwoLayerModel(input_size, output_size)
 four_layer_model = FourLayerModel(input_size, hidden_size1, hidden_size2, output_size)
 
 
-def main():
+def train_and_test():
     train_loss_lst_2 = []
     test_loss_lst_2 = []
     train_accuracy_lst_2 = []
     test_accuracy_lst_2 = []
+    
     train_loss_lst_4 = []
     test_loss_lst_4 = []
     train_accuracy_lst_4 = []
@@ -76,4 +77,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    train_and_test()

@@ -15,7 +15,7 @@ output_size = 10
 three_layer_model = ThreeLayerModel(input_size, hidden_size, output_size)
 
 
-def main():
+def train_and_test():
     train_loss_lst = []
     test_loss_lst = []
     train_accuracy_lst = []
@@ -52,4 +52,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    train_and_test()

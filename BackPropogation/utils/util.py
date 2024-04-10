@@ -109,13 +109,13 @@ def CrossEntropy_loss(y_true, y_pred):
     return loss
 
 
-def compute_loss(images, labels, forward_prop):
-    _, _, _, A2_full = forward_prop(images)
+def compute_loss(images, labels, model):
+    _, _, _, A2_full = model.forward(images)
     return CrossEntropy_loss(labels, A2_full)
 
 
-def compute_accuracy(images, labels, predict):
-    predictions = predict(images)
+def compute_accuracy(images, labels, model):
+    predictions = model.predict(images)
     return np.mean(np.argmax(labels, axis=1) == predictions)
 
 

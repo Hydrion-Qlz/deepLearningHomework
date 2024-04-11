@@ -48,3 +48,14 @@ class ThreeLayerModel:
 
     def normalization_loss(self):
         return 0
+
+    def save_parameter(self, file_path, **kwargs):
+        np.savez(file_path, W1=self.W1, b1=self.b1, W2=self.W2, b2=self.b2, **kwargs)
+
+    def load_parameter(self, file_path):
+        parameters = np.load(file_path)
+        self.W1 = parameters['W1']
+        self.b1 = parameters['b1']
+        self.W2 = parameters['W2']
+        self.b2 = parameters['b2']
+        return parameters

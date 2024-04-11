@@ -50,3 +50,27 @@ class ThreeLayerModel_Adam(ThreeLayerModel):
         mb2_corrected = self.mb2 / (1 - np.power(self.beta1, self.t))
         vb2_corrected = self.vb2 / (1 - np.power(self.beta2, self.t))
         self.b2 -= learning_rate * mb2_corrected / (np.sqrt(vb2_corrected) + self.epsilon)
+
+    def save_parameter(self, file_path, **kwargs):
+        dct = {
+            "beta1": self.beta1,
+            "beta2": self.beta2,
+            "epsiilon": self.epsilon, "t": self.t,
+            "mW1": self.mW1, "vW1": self.vW1,
+            "mb1": self.mb1, "vb1": self.vb1,
+            "mW2": self.mW2, "vW2": self.vW2,
+            "mb2": self.mb2, "vb2": self.vb2
+        }
+        super().save_parameter(file_path, **dct)
+
+    def load_parameter(self, file_path):
+        params = np.load(file_path)
+        self.mW1, self.vW1 = params['mW1'], params['vW1']
+        self.mb1, self.vb1 = params['mb1'], params['vb1']
+        self.mW2, self.vW2 = params['mW2'], params['vW2']
+        self.mb2, self.vb2 = params['mb2'], params['vb1']
+
+        self.beta1 = params['beta1']
+        self.beta2 = params['beta2']
+        self.epsilon = params['epsilon']
+        self.t = params['t']  # 初始化时间步

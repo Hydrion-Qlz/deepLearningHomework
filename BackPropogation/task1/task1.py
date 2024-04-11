@@ -5,7 +5,7 @@ train_images, train_labels = load_mnist_train()
 test_images, test_labels = load_mnist_test()
 
 # Initialize parameters
-epochs = 10
+epochs = 30
 batch_size = 32
 learning_rate = 0.01
 input_size = 28 * 28
@@ -48,7 +48,12 @@ def train_and_test():
 
     plot_result_figure(train_loss_lst, test_loss_lst, train_accuracy_lst, test_accuracy_lst,
                        "Model Performance",
-                       "./task1/result.png")
+                       "./task1/image/result.png")
+    save_train_result(train_loss_lst, test_loss_lst, train_accuracy_lst, test_accuracy_lst,
+                      "./task1/result/train-result-loss-and-accuracy.npz")
+    three_layer_model.save_parameter("./task1/result/train-result-params.npz", epochs=epochs,
+                                     batch_size=batch_size,
+                                     learning_rate=learning_rate)
 
 
 if __name__ == '__main__':

@@ -5,7 +5,7 @@ train_images, train_labels = load_mnist_train()
 test_images, test_labels = load_mnist_test()
 
 # Initialize parameters
-epochs = 10
+epochs = 30
 batch_size = 32
 learning_rate = 0.01
 input_size = 28 * 28
@@ -13,7 +13,7 @@ hidden_size = 256
 output_size = 10
 
 
-def train_and_test(model, figure_title, save_path, batch_size=batch_size, epochs=epochs):
+def train_and_test(model, figure_title, save_name, batch_size=batch_size, epochs=epochs):
     train_loss_lst = []
     test_loss_lst = []
     train_accuracy_lst = []
@@ -46,7 +46,12 @@ def train_and_test(model, figure_title, save_path, batch_size=batch_size, epochs
 
     plot_result_figure(train_loss_lst, test_loss_lst, train_accuracy_lst, test_accuracy_lst,
                        figure_title,
-                       save_path)
+                       "./task3/image/" + save_name + ".png")
+    save_train_result(train_loss_lst, test_loss_lst, train_accuracy_lst, test_accuracy_lst,
+                      "./task3/result/" + save_name + "-loss-and-accuracy.npz")
+    model.save_parameter(f"./task3/result/{save_name}-train-result-params.npz", epochs=epochs,
+                         batch_size=batch_size,
+                         learning_rate=learning_rate)
 
 
 if __name__ == '__main__':
@@ -55,24 +60,22 @@ if __name__ == '__main__':
     Mini_batch_gradient_model = ThreeLayerModel(input_size, hidden_size, output_size)
     train_and_test(model=Mini_batch_gradient_model,
                    batch_size=32,
-                   epochs=10,
                    figure_title="Model Performance Using Mini-batch Gradient",
-                   save_path="./task3/Mini-batch-Gradient.png")
+                   save_name="Mini-batch-Gradient")
 
     # BGD - set batch size to dataset size
     print("Training Model Using BGD")
     BGD_model = ThreeLayerModel(input_size, hidden_size, output_size)
     train_and_test(model=BGD_model,
                    batch_size=train_images.shape[0],
-                   epochs=10,
                    figure_title="Model Performance Using BGD",
-                   save_path="./task3/BGD.png")
+                   save_name="BGD")
 
     # SGD - set batch size to 1
     print("Training Model Using SGD")
     SGD_model = ThreeLayerModel(input_size, hidden_size, output_size)
     train_and_test(model=SGD_model,
                    batch_size=1,
-                   epochs=10,
+                   epochs=15,
                    figure_title="Model Performance Using SGD",
-                   save_path="./task3/SGD.png")
+                   save_name="SGD")

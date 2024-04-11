@@ -5,7 +5,7 @@ train_images, train_labels = load_mnist_train()
 test_images, test_labels = load_mnist_test()
 
 # Initialize parameters
-epochs = 10
+epochs = 30
 batch_size = 32
 learning_rate = 0.01
 input_size = 28 * 28
@@ -13,7 +13,7 @@ hidden_size = 256
 output_size = 10
 
 
-def train_and_test(model, figure_title, save_path, batch_size=batch_size, epochs=epochs):
+def train_and_test(model, figure_title, save_name, batch_size=batch_size, epochs=epochs):
     train_loss_lst = []
     test_loss_lst = []
     train_accuracy_lst = []
@@ -46,7 +46,12 @@ def train_and_test(model, figure_title, save_path, batch_size=batch_size, epochs
 
     plot_result_figure(train_loss_lst, test_loss_lst, train_accuracy_lst, test_accuracy_lst,
                        figure_title,
-                       save_path)
+                       "./task4/image/" + save_name + ".png")
+    save_train_result(train_loss_lst, test_loss_lst, train_accuracy_lst, test_accuracy_lst,
+                      "./task4/result/" + save_name + "-loss-and-accuracy.npz")
+    model.save_parameter(f"./task4/result/{save_name}-train-result-params.npz", epochs=epochs,
+                         batch_size=batch_size,
+                         learning_rate=learning_rate)
 
 
 if __name__ == '__main__':
@@ -55,25 +60,25 @@ if __name__ == '__main__':
     zero_initialize_model = ThreeLayerModel(input_size, hidden_size, output_size, zero_initialize)
     train_and_test(model=zero_initialize_model,
                    figure_title="Model Performance Using Zero Initialize",
-                   save_path="./task4/zero-initialize.png")
+                   save_name="zero-initialize")
 
     # Random Initialize
     print("Training Model Using Random Initialize")
     random_initialize_model = ThreeLayerModel(input_size, hidden_size, output_size, random_initialize)
     train_and_test(model=random_initialize_model,
                    figure_title="Model Performance Using Random Initialize",
-                   save_path="./task4/random-initialize.png")
+                   save_name="random-initialize")
 
     # Xavier Initialize
     print("Training Model Using Xavier Initialize")
     Xavier_initialize_model = ThreeLayerModel(input_size, hidden_size, output_size, Xavier_initialize)
     train_and_test(model=Xavier_initialize_model,
                    figure_title="Model Performance Using Xavier Initialize",
-                   save_path="./task4/xavier-initialize.png")
+                   save_name="xavier-initialize")
 
     # He Initialize
     print("Training Model Using He Initialize")
     he_initialize_model = ThreeLayerModel(input_size, hidden_size, output_size, He_initialize)
     train_and_test(model=he_initialize_model,
                    figure_title="Model Performance Using He Initialize",
-                   save_path="./task4/he-initialize.png")
+                   save_name="he-initialize")

@@ -45,3 +45,6 @@ class ThreeLayerModel:
     def predict(self, X):
         _, _, _, A2 = self.forward(X)
         return np.argmax(A2, axis=1)
+
+    def normalization_loss(self):
+        return 0

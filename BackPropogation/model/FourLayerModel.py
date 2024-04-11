@@ -56,3 +56,6 @@ class FourLayerModel:
     def predict(self, X):
         _, _, _, _, _, A3 = self.forward(X)
         return np.argmax(A3, axis=1)
+
+    def normalization_loss(self):
+        return 0

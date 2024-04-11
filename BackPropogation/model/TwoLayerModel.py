@@ -33,3 +33,6 @@ class TwoLayerModel:
     def predict(self, X):
         _, A1 = self.forward(X)
         return np.argmax(A1, axis=1)
+
+    def normalization_loss(self):
+        return 0

@@ -4,3 +4,5 @@ from .ThreeLayerModel_RMSProp import ThreeLayerModel_RMSProp
 from .ThreeLayerModel_Adam import ThreeLayerModel_Adam
 from .FourLayerModel import FourLayerModel
 from .TwoLayerModel import TwoLayerModel
+from .ThreeLayerModel_L1_Normalization import ThreeLayerModel_L1_Normalization
+from .ThreeLayerModel_L2_Normalization import ThreeLayerModel_L2_Normalization

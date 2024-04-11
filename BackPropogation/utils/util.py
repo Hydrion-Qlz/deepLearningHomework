@@ -111,7 +111,7 @@ def CrossEntropy_loss(y_true, y_pred):
 
 def compute_loss(images, labels, model):
     result = model.forward(images)
-    return CrossEntropy_loss(labels, result[-1])
+    return CrossEntropy_loss(labels, result[-1]) + model.normalization_loss()
 
 
 def compute_accuracy(images, labels, model):

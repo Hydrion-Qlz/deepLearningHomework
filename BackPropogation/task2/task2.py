@@ -5,7 +5,7 @@ train_images, train_labels = load_mnist_train()
 test_images, test_labels = load_mnist_test()
 
 # Initialize parameters
-epochs = 5
+epochs = 10
 batch_size = 32
 learning_rate = 0.01
 input_size = 28 * 28

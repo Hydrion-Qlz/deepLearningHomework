@@ -5,7 +5,7 @@ train_images, train_labels = load_mnist_train()
 test_images, test_labels = load_mnist_test()
 
 # Initialize parameters
-epochs = 10
+epochs = 30
 batch_size = 32
 learning_rate = 0.01
 input_size = 28 * 28
@@ -13,7 +13,7 @@ hidden_size = 256
 output_size = 10
 
 
-def train_and_test(model, figure_title, save_path, batch_size=batch_size, epochs=epochs):
+def train_and_test(model, figure_title, save_name, batch_size=batch_size, epochs=epochs):
     train_loss_lst = []
     test_loss_lst = []
     train_accuracy_lst = []
@@ -46,7 +46,12 @@ def train_and_test(model, figure_title, save_path, batch_size=batch_size, epochs
 
     plot_result_figure(train_loss_lst, test_loss_lst, train_accuracy_lst, test_accuracy_lst,
                        figure_title,
-                       save_path)
+                       "./task6/image/" + save_name + ".png")
+    save_train_result(train_loss_lst, test_loss_lst, train_accuracy_lst, test_accuracy_lst,
+                      "./task6/result/" + save_name + "-loss-and-accuracy.npz")
+    model.save_parameter(f"./task6/result/{save_name}-train-result-params.npz", epochs=epochs,
+                         batch_size=batch_size,
+                         learning_rate=learning_rate)
 
 
 if __name__ == '__main__':
@@ -55,18 +60,18 @@ if __name__ == '__main__':
     basic_model = ThreeLayerModel(input_size, hidden_size, output_size)
     train_and_test(model=basic_model,
                    figure_title="Model Performance Using No Normalization",
-                   save_path="./task6/no-normalization.png")
+                   save_name="no-normalization")
 
     # L1 Normalization
     print("Training Model Using L1 Normalization")
     l1_model = ThreeLayerModel_L1_Normalization(input_size, hidden_size, output_size)
     train_and_test(model=l1_model,
                    figure_title="Model Performance Using L1 Normalization",
-                   save_path="./task6/L1-normalization.png")
+                   save_name="L1-normalization")
 
     # L2 Normalization
     print("Training Model Using L2 Normalization")
     l2_model = ThreeLayerModel_L2_Normalization(input_size, hidden_size, output_size)
     train_and_test(model=l2_model,
                    figure_title="Model Performance Using L2 Normalization",
-                   save_path="./task6/L2-normalization.png")
+                   save_name="L2-normalization")

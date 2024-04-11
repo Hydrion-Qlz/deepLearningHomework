@@ -5,7 +5,7 @@ train_images, train_labels = load_mnist_train()
 test_images, test_labels = load_mnist_test()
 
 # Initialize parameters
-epochs = 10
+epochs = 30
 batch_size = 32
 learning_rate = 0.01
 input_size = 28 * 28
@@ -70,10 +70,21 @@ def train_and_test():
 
     plot_result_figure(train_loss_lst_2, test_loss_lst_2, train_accuracy_lst_2, test_accuracy_lst_2,
                        "Two Layer Model Performance",
-                       "./task2/twoLayerModel.png")
+                       "./task2/image/twoLayerModel.png")
+    save_train_result(train_loss_lst_2, test_loss_lst_2, train_accuracy_lst_2, test_accuracy_lst_2,
+                      "./task2/result/train-result-loss-and-accuracy-2-layer.npz")
+    two_layer_model.save_parameter("./task2/result/train-result-params-2-layer.npz", epochs=epochs,
+                                   batch_size=batch_size,
+                                   learning_rate=learning_rate)
+
     plot_result_figure(train_loss_lst_4, test_loss_lst_4, train_accuracy_lst_4, test_accuracy_lst_4,
                        "Four Layer Model Performance",
-                       "./task2/fourLayerModel.png")
+                       "./task2/image/fourLayerModel.png")
+    save_train_result(train_loss_lst_4, test_loss_lst_4, train_accuracy_lst_4, test_accuracy_lst_4,
+                      "./task2/result/train-result-loss-and-accuracy-4-layer.npz")
+    four_layer_model.save_parameter("./task2/result/train-result-params-4-layer.npz", epochs=epochs,
+                                    batch_size=batch_size,
+                                    learning_rate=learning_rate)
 
 
 if __name__ == '__main__':

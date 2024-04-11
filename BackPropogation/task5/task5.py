@@ -5,7 +5,7 @@ train_images, train_labels = load_mnist_train()
 test_images, test_labels = load_mnist_test()
 
 # Initialize parameters
-epochs = 10
+epochs = 30
 batch_size = 32
 learning_rate = 0.01
 input_size = 28 * 28
@@ -13,7 +13,7 @@ hidden_size = 256
 output_size = 10
 
 
-def train_and_test(model, figure_title, save_path, batch_size=batch_size, epochs=epochs):
+def train_and_test(model, figure_title, save_name, batch_size=batch_size, epochs=epochs):
     train_loss_lst = []
     test_loss_lst = []
     train_accuracy_lst = []
@@ -46,7 +46,12 @@ def train_and_test(model, figure_title, save_path, batch_size=batch_size, epochs
 
     plot_result_figure(train_loss_lst, test_loss_lst, train_accuracy_lst, test_accuracy_lst,
                        figure_title,
-                       save_path)
+                       "./task5/image/" + save_name + ".png")
+    save_train_result(train_loss_lst, test_loss_lst, train_accuracy_lst, test_accuracy_lst,
+                      "./task5/result/" + save_name + "-loss-and-accuracy.npz")
+    model.save_parameter(f"./task5/result/{save_name}-train-result-params.npz", epochs=epochs,
+                         batch_size=batch_size,
+                         learning_rate=learning_rate)
 
 
 if __name__ == '__main__':
@@ -55,25 +60,25 @@ if __name__ == '__main__':
     constant_model = ThreeLayerModel(input_size, hidden_size, output_size)
     train_and_test(model=constant_model,
                    figure_title="Model Performance Using Constant Learning Rate",
-                   save_path="./task5/constant-learning-rate.png")
+                   save_name="constant-learning-rate")
 
     # Momentum
     print("Training Model Using Momentum")
     momentum_model = ThreeLayerModel_Momentum(input_size, hidden_size, output_size)
     train_and_test(model=momentum_model,
                    figure_title="Model Performance Using Momentum",
-                   save_path="./task5/momentum.png")
+                   save_name="momentum")
 
     # RMSProp
     print("Training Model Using RMSProp")
     RMSProp_model = ThreeLayerModel_RMSProp(input_size, hidden_size, output_size)
     train_and_test(model=RMSProp_model,
                    figure_title="Model Performance Using RMSProp",
-                   save_path="./task5/RMSProp.png")
+                   save_name="RMSProp")
 
     # Adam
     print("Training Model Using Adam")
     Adam_model = ThreeLayerModel_Adam(input_size, hidden_size, output_size)
     train_and_test(model=Adam_model,
                    figure_title="Model Performance Using RMSProp",
-                   save_path="./task5/Adam.png")
+                   save_name="Adam")

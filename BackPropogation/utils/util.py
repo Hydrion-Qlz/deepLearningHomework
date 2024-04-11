@@ -66,14 +66,18 @@ def plot_result_figure(
     epochs = range(1, len(train_loss_lst) + 1)
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 8), sharex=True)
 
-    ax1.plot(epochs, train_loss_lst, label='Training Loss', color='tab:blue')
-    ax1.plot(epochs, test_loss_lst, label='Testing Loss', color='tab:orange')
+    ax1.plot(epochs, train_loss_lst, label='Training Loss', color='tab:red')
+    ax1.plot(epochs, test_loss_lst, label='Testing Loss', color='tab:green')
+    ax1.scatter(epochs, train_loss_lst, color='tab:red')
+    ax1.scatter(epochs, test_loss_lst, marker='^', color='tab:green')
     ax1.set_ylabel('Loss')
     ax1.set_title('Training and Test Loss')
     ax1.legend()
 
-    ax2.plot(epochs, train_accuracy_lst, label='Training Accuracy', color='tab:green')
-    ax2.plot(epochs, test_accuracy_lst, label='Testing Accuracy', color='tab:red')
+    ax2.plot(epochs, train_accuracy_lst, label='Training Accuracy', color='tab:red')
+    ax2.plot(epochs, test_accuracy_lst, label='Testing Accuracy', color='tab:green')
+    ax2.scatter(epochs, train_accuracy_lst, color='tab:red')
+    ax2.scatter(epochs, test_accuracy_lst, marker='^', color='tab:green')
     ax2.set_xlabel('Epochs')
     ax2.set_ylabel('Accuracy')
     ax2.set_title('Training and Test Accuracy')
@@ -125,3 +129,10 @@ def print_epoch_result(epoch, test_accuracy_lst, test_loss_lst, train_accuracy_l
     print(f"Testing Loss: {test_loss_lst[-1]}")
     print(f"Training Accuracy: {train_accuracy_lst[-1]}")
     print(f"Testing Accuracy: {test_accuracy_lst[-1]}\n")
+
+
+def save_train_result(train_loss_lst, test_loss_lst, train_accuracy_lst, test_accuracy_lst, file_path):
+    np.savez(file_path, test_accuracy_lst=test_accuracy_lst,
+             test_loss_lst=test_loss_lst,
+             train_accuracy_lst=train_accuracy_lst,
+             train_loss_lst=train_loss_lst)

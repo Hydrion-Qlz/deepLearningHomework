@@ -36,3 +36,12 @@ class TwoLayerModel:
 
     def normalization_loss(self):
         return 0
+
+    def save_parameter(self, file_path, **kwargs):
+        np.savez(file_path, W1=self.W1, b1=self.b1, **kwargs)
+
+    def load_parameter(self, file_path):
+        parameters = np.load(file_path)
+        self.W1 = parameters['W1']
+        self.b1 = parameters['b1']
+        return parameters

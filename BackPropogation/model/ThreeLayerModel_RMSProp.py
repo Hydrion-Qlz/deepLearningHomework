@@ -31,3 +31,16 @@ class ThreeLayerModel_RMSProp(ThreeLayerModel):
 
         self.sb2 = self.decay_rate * self.sb2 + (1 - self.decay_rate) * np.square(db2)
         self.b2 -= learning_rate * db2 / (np.sqrt(self.sb2) + self.epsilon)
+
+    def save_parameter(self, file_path, **kwargs):
+        super().save_parameter(file_path, decay_rate=self.decay_rate, epsilon=self.epsilon,
+                               sW1=self.sW1, sb1=self.sb1,
+                               sW2=self.sW2, sb2=self.sb2)
+
+    def load_parameter(self, file_path):
+        params = super().load_parameter(file_path)
+
+        self.decay_rate = params["decay_rate"]
+        self.epsilon = params["epsilon"]
+        self.sW1, self.sb1 = params["sW1"], params["sb1"]
+        self.sW2, self.sb2 = params["sW2"], params["sb2"]

@@ -25,3 +25,18 @@ class ThreeLayerModel_Momentum(ThreeLayerModel):
         self.W2 -= self.VdW2
         self.Vdb2 = self.momentum * self.Vdb2 + learning_rate * db2
         self.b2 -= self.Vdb2
+
+    def save_parameter(self, file_path, **kwargs):
+        super().save_parameter(file_path, momentum=self.momentum,
+                               VdW1=self.VdW1,
+                               Vdb1=self.Vdb1,
+                               VdW2=self.VdW2,
+                               Vdb2=self.Vdb2)
+
+    def load_parameter(self, file_path):
+        params = super().load_parameter(file_path)
+
+        self.VdW1 = params["VdW1"]
+        self.Vdb1 = params["Vdb1"]
+        self.VdW2 = params["VdW2"]
+        self.Vdb2 = params["Vdb2"]

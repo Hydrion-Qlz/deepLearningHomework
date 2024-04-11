@@ -26,3 +26,10 @@ class ThreeLayerModel_L1_Normalization(ThreeLayerModel):
 
     def normalization_loss(self):
         return self.lamda * (np.sum(np.abs(self.W1)) + np.sum(np.abs(self.W2)))
+
+    def save_parameter(self, file_path, **kwargs):
+        super().save_parameter(file_path, lamda=self.lamda)
+
+    def load_parameter(self, file_path):
+        params = super().load_parameter(file_path)
+        self.lamda = params['lamda']

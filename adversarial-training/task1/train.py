@@ -4,7 +4,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
-from taskA.model.model import SimpleCNN
+from task1.model.model import SimpleCNN
 
 
 # 模型训练函数

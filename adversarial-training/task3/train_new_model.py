@@ -73,7 +73,7 @@ def load_dataset(transform):
         transform=transform
     )
 
-    train_datasets = [attack_dataset, train_dataset]
+    train_datasets = [train_dataset, attack_dataset]
     return ConcatDataset(train_datasets)
 
 
@@ -93,6 +93,6 @@ if __name__ == '__main__':
     train_model(15, 30, model, train_loader, device)
 
     accuracy = test_model(test_loader, device)
-    print(f'Accuracy: {accuracy}%')
+    print(f'Accuracy in test dataset: {accuracy}%')
 
     torch.save(model.state_dict(), './model/model_params_with_attack.pth')

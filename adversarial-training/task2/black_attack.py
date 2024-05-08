@@ -53,7 +53,7 @@ def black_attack(black_model, data):
 
 
 if __name__ == '__main__':
-    data = load_data('data/successful_attack_samples-0.001-79.npz')
+    data = load_data('data/black_attack_data_79.npz')
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     black_model = CNN().to(device)
     black_model.load_state_dict(torch.load("model/cnn.ckpt"))
@@ -65,7 +65,7 @@ if __name__ == '__main__':
     print(f"Success Rate: {success_rate * 100}%")
 
     # samples = [sample for sample in attack_success_list if sample[1] != 7]
-    selected_samples = random.sample(attack_success_list, min(10, len(samples)))
+    selected_samples = random.sample(attack_success_list, min(10, len(attack_success_list)))
     original_images, original_labels, perturbed_images, new_labels = zip(
         *[(x[0], x[1], x[2], x[3]) for x in selected_samples])
     plot_images(original_images, original_labels, perturbed_images, new_labels,

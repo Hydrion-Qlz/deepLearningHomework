@@ -1,12 +1,28 @@
+import pickle
 import random
 
 import matplotlib.pyplot as plt
+import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
-from torchvision import datasets, transforms
+from torchvision import transforms
 
+from task1.attack_dataset import CustomDataset
 from task1.model.model import SimpleCNN
+
+
+def load_data(filepath):
+    with open(filepath, 'rb') as file:
+        data = pickle.load(file)
+    images = data[0]
+    labels = data[1]
+
+    images = np.array(images)
+    # Reshape the images to (1, 28, 28)
+    reshaped_images = torch.from_numpy(images).reshape(-1, 1, 28, 28)
+
+    return reshaped_images, labels
 
 
 def fgsm_attack(image, epsilon, data_grad):
@@ -69,8 +85,12 @@ if __name__ == '__main__':
         transforms.ToTensor(),
         transforms.Normalize((0.5,), (0.5,))
     ])
-    test_dataset = datasets.FashionMNIST('./data', train=False, download=False, transform=transform)
-    test_loader = get_correct_test_loader(model, test_dataset)
+
+    images, labels = load_data('data/correct_1k.pkl')
+
+    dataset = CustomDataset(images, labels)
+    # dataset = datasets.FashionMNIST('./data', train=False, download=False, transform=transform)
+    test_loader = get_correct_test_loader(model, dataset)
 
     # 定义目标类别映射
     target_classes = {0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 0}
@@ -107,7 +127,7 @@ if __name__ == '__main__':
         data_grad = images.grad.data
 
         # 调用FGSM攻击
-        epsilon = 0.0001  # 攻击强度
+        epsilon = 0.01  # 攻击强度
         perturbed_data = fgsm_attack(images, epsilon, data_grad)
 
         # 重新分类扰动后的图像
@@ -131,4 +151,20 @@ if __name__ == '__main__':
         *[(x[0], x[1], x[2], x[3]) for x in selected_samples])
 
     # 绘制并保存图像
-    plot_images(original_images, original_labels, perturbed_images, new_labels, f'data/result-{epsilon}.png')
+    plot_images(original_images, original_labels, perturbed_images, new_labels,
+                f'data/result-{epsilon}-{attack_success_rate}%.png')
+
+    # 提取数据
+    original_images, original_labels, perturbed_images, perturbed_labels = zip(
+        *[(x[0], x[1], x[2], x[3]) for x in successful_samples])
+
+    # 将数据转换为numpy数组
+    original_images_np = np.array([img.cpu().detach().numpy() for img in original_images])
+    original_labels_np = np.array([lbl.cpu().detach().numpy() for lbl in original_labels])
+    perturbed_images_np = np.array([pimg.cpu().detach().numpy() for pimg in perturbed_images])
+    perturbed_labels_np = np.array([plbl.cpu().detach().numpy() for plbl in perturbed_labels])
+
+    # 保存到.npy文件
+    np.savez('result/successful_attack_samples.npz', original_images=original_images_np,
+             original_labels=original_labels_np,
+             perturbed_images=perturbed_images_np, perturbed_labels=perturbed_labels_np)

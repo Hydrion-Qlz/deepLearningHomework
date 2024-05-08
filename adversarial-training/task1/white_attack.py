@@ -49,9 +49,11 @@ def get_correct_test_loader(model, test_dataset):
             if predicted.item() == labels:
                 correct += 1
                 correct_images.append((images, labels))
+
     print(f"测试数据集总共{total}张图片, 其中预测正确的图片有{correct}张")
     correct_images = [(image.squeeze(0), label) for image, label in correct_images]
     images, labels = zip(*correct_images)
+    # np.savez(f"data/attack_image_10k_{len(images)}.npz", images=images, labels=labels)
 
     correct_dataset = torch.utils.data.TensorDataset(torch.stack(images), torch.tensor(labels))
     correct_loader = DataLoader(correct_dataset, batch_size=1, shuffle=True)
@@ -78,7 +80,7 @@ def plot_images(original_images, original_labels, perturbed_images, new_labels, 
 
 
 if __name__ == '__main__':
-    dataset_type = "1k"
+    dataset_type = "10k"
     show_all_kind = False
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = SimpleCNN()
@@ -91,7 +93,7 @@ if __name__ == '__main__':
 
     dataset = datasets.FashionMNIST('./data', train=False, download=False, transform=transform)
     if dataset_type == "1k":
-        images, labels = load_data('data/correct_1k.pkl')
+        images, labels = load_data('data/attack_1k/correct_1k.pkl')
         dataset = CustomDataset(images, labels, transform=transform)
 
     test_loader = get_correct_test_loader(model, dataset)
@@ -175,4 +177,5 @@ if __name__ == '__main__':
     np.savez(f'result/test-{dataset_type}-result/successful_attack_samples-{epsilon}-{len(successful_samples)}.npz',
              original_images=original_images_np,
              original_labels=original_labels_np,
-             perturbed_images=perturbed_images_np, perturbed_labels=perturbed_labels_np)
+             perturbed_images=perturbed_images_np,
+             perturbed_labels=perturbed_labels_np)

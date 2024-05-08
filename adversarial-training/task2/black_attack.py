@@ -1,5 +1,8 @@
+import random
+
 import numpy as np
 import torch
+from matplotlib import pyplot as plt
 
 from task2.model.model import CNN
 
@@ -12,6 +15,25 @@ def load_data(file_name):
     perturbed_images = data['perturbed_images']
     perturbed_labels = data['perturbed_labels']
     return original_images, original_labels, perturbed_images, perturbed_labels
+
+
+def plot_images(original_images, original_labels, perturbed_images, new_labels, file_path):
+    plt.figure(figsize=(len(original_images), 2))
+    num_images = len(original_images)
+
+    for i in range(num_images):
+        plt.subplot(2, num_images, i + 1)
+        plt.imshow(original_images[i].reshape(28, 28), cmap='gray')
+        plt.title(f"Origin: {original_labels[i].item()}")
+        plt.axis('off')
+
+        plt.subplot(2, num_images, num_images + i + 1)
+        plt.imshow(perturbed_images[i].reshape(28, 28), cmap='gray')
+        plt.title(f"Attack: {new_labels[i].item()}")
+        plt.axis('off')
+
+    plt.tight_layout()
+    plt.savefig(file_path)
 
 
 def black_attack(black_model, data):
@@ -37,6 +59,14 @@ if __name__ == '__main__':
     black_model.load_state_dict(torch.load("model/cnn.ckpt"))
 
     attack_success_list = black_attack(black_model, data)
-    print(len(attack_success_list))
-    print(len(data[0]))
-    print(f"Success Rate: {len(attack_success_list) / len(data[0]) * 100}%")
+    success_rate = len(attack_success_list) / len(data[0])
+    print(f"Dataset Num: {len(data[0])}")
+    print(f"Attack Success Num: {len(attack_success_list)}")
+    print(f"Success Rate: {success_rate * 100}%")
+
+    # samples = [sample for sample in attack_success_list if sample[1] != 7]
+    selected_samples = random.sample(attack_success_list, min(10, len(samples)))
+    original_images, original_labels, perturbed_images, new_labels = zip(
+        *[(x[0], x[1], x[2], x[3]) for x in selected_samples])
+    plot_images(original_images, original_labels, perturbed_images, new_labels,
+                f"result/black-attack-result-{success_rate * 100}%.png")

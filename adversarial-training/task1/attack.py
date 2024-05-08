@@ -59,7 +59,7 @@ def get_correct_test_loader(model, test_dataset):
 
 
 def plot_images(original_images, original_labels, perturbed_images, new_labels, file_path):
-    plt.figure(figsize=(10, 2))
+    plt.figure(figsize=(len(original_images), 2))
     num_images = len(original_images)
 
     for i in range(num_images):

@@ -84,7 +84,7 @@ if __name__ == '__main__':
     model_without_attack.load_state_dict(torch.load("model/model_params_without_attack.pth"))
 
     model_with_attack = SimpleCNN()
-    model_without_attack.load_state_dict(torch.load("model/model_params_with_attack.pth"))
+    model_with_attack.load_state_dict(torch.load("model/model_params_with_attack.pth"))
 
     # 测试两个模型在测试集上的准确率
     test_two_model(test_model_accuracy_on_test_dataset,

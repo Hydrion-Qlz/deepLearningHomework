@@ -63,7 +63,7 @@ def test_model(test_loader, device):
 def load_dataset(transform):
     data = np.load("data/successful_attack_samples-0.0001-770.npz")
     images = data['perturbed_images'].reshape(-1, 28, 28)
-    labels = data['perturbed_labels'].reshape(-1)
+    labels = data['original_labels'].reshape(-1)
     attack_dataset = CustomDataset(images, labels, transform)
 
     train_dataset = torchvision.datasets.FashionMNIST(

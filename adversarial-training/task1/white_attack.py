@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch.nn as nn
-from PIL import Image
 from torch.utils.data import DataLoader
 from torchvision import transforms, datasets
+from tqdm import tqdm
 
 from task1.attack_dataset import CustomDataset
 from task1.model.model import SimpleCNN
@@ -18,19 +18,9 @@ def load_data(filepath):
         data = pickle.load(file)
     images, labels = data[0], data[1]
 
-    # 将 images 转换为 NumPy 数组
     images = np.array(images, dtype='float32') / 255.0
-    # 将每个图像的一维数组重新调整为二维的 28x28 形状
-    images = images.reshape(-1, 28, 28)  # -1 表示自动计算该维度的大小
-
+    images = images.reshape(-1, 28, 28)
     return images, labels
-
-
-def fgsm_attack(image, epsilon, data_grad):
-    sign_data_grad = data_grad.sign()
-    perturbed_image = image + epsilon * sign_data_grad
-    perturbed_image = torch.clamp(perturbed_image, 0, 1)
-    return perturbed_image
 
 
 def get_correct_test_loader(model, test_dataset):
@@ -53,7 +43,7 @@ def get_correct_test_loader(model, test_dataset):
     print(f"测试数据集总共{total}张图片, 其中预测正确的图片有{correct}张")
     correct_images = [(image.squeeze(0), label) for image, label in correct_images]
     images, labels = zip(*correct_images)
-    # np.savez(f"data/attack_image_10k_{len(images)}.npz", images=images, labels=labels)
+    np.savez(f"data/attack_image_10k_{len(images)}.npz", images=images, labels=labels)
 
     correct_dataset = torch.utils.data.TensorDataset(torch.stack(images), torch.tensor(labels))
     correct_loader = DataLoader(correct_dataset, batch_size=1, shuffle=True)
@@ -79,6 +69,72 @@ def plot_images(original_images, original_labels, perturbed_images, new_labels, 
     plt.savefig(file_path)
 
 
+def save_attack_success_dataset(samples, file_path):
+    original_images, original_labels, perturbed_images, perturbed_labels = zip(
+        *[(x[0], x[1], x[2], x[3]) for x in samples])
+
+    original_images_np = np.array([img.cpu().detach().numpy() for img in original_images])
+    original_labels_np = np.array([lbl.cpu().detach().numpy() for lbl in original_labels])
+    perturbed_images_np = np.array([pimg.cpu().detach().numpy() for pimg in perturbed_images])
+    perturbed_labels_np = np.array([plbl.cpu().detach().numpy() for plbl in perturbed_labels])
+
+    # 保存到.npy文件
+    np.savez(file_path,
+             original_images=original_images_np,
+             original_labels=original_labels_np,
+             perturbed_images=perturbed_images_np,
+             perturbed_labels=perturbed_labels_np)
+
+
+def select_10_samples_and_save(successful_samples, file_path):
+    selected_samples = random.sample(successful_samples, min(10, len(successful_samples)))
+    original_images, original_labels, perturbed_images, new_labels = zip(
+        *[(x[0], x[1], x[2], x[3]) for x in selected_samples])
+
+    plot_images(original_images, original_labels, perturbed_images, new_labels, file_path)
+
+
+def white_attack(model, data_loader, target_classes, iterations):
+    model.eval()
+    successful_samples = []
+    attempts = 0
+    criterion = nn.CrossEntropyLoss()
+    for image, label in tqdm(data_loader, desc="white attack process"):
+        origin_image = image.clone()
+        image, label = image.to(device), label.to(device)
+        image.requires_grad = True
+
+        target_label = torch.tensor([target_classes[label.item()]], device=device)
+
+        # 只对原始分类正确的图像进行攻击
+        output = model(image)
+        init_pred = output.max(1, keepdim=True)[1]
+        if init_pred.item() != label.item():
+            continue
+
+        # 白盒攻击
+        optimizer = torch.optim.Adam([image], lr=0.01)
+        attack_success = False
+        for _ in range(iterations):
+            optimizer.zero_grad()
+            output = model(image)
+            pred = output.max(1, keepdim=True)[1]
+            if pred.item() == target_label.item():
+                attack_success = True
+                break
+            loss = criterion(output, target_label)
+            loss.backward()
+            optimizer.step()
+
+        # 判断是否攻击成功
+        if attack_success:
+            # perturbed_data = image.detach().cpu().numpy()
+            successful_samples.append((origin_image, label, image, target_label))
+
+        attempts += 1
+    return successful_samples, attempts
+
+
 if __name__ == '__main__':
     dataset_type = "10k"
     show_all_kind = False
@@ -96,86 +152,20 @@ if __name__ == '__main__':
         images, labels = load_data('data/attack_1k/correct_1k.pkl')
         dataset = CustomDataset(images, labels, transform=transform)
 
-    test_loader = get_correct_test_loader(model, dataset)
+    data_loader = DataLoader(dataset, batch_size=1, shuffle=True)
+    # test_loader = get_correct_test_loader(model, dataset)
 
-    # 定义目标类别映射
     target_classes = {0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 0}
+    iterations = 5
 
-    # 准备模型
-    model.eval()
-
-    # 攻击成功的计数器
-    successful_samples = []
-    label_not_7 = 0
-    attempts = 0
-
-    for images, labels in test_loader:
-        # if attempts >= 1000 or len(successful_samples) > 20:
-        #     break
-        images, labels = images.to(device), labels.to(device)
-        images.requires_grad = True
-
-        # 设置目标类别
-        target_label = torch.tensor([target_classes[labels.item()]], device=device)
-
-        # 只对原始分类正确的图像进行攻击
-        output = model(images)
-        init_pred = output.max(1, keepdim=True)[1]
-
-        if init_pred.item() != labels.item():
-            continue
-
-        # 计算损失
-        criterion = nn.CrossEntropyLoss()
-        loss = criterion(output, target_label)
-        model.zero_grad()
-        loss.backward()
-        data_grad = images.grad.data
-
-        # 调用FGSM攻击
-        epsilon = 1  # 攻击强度
-        perturbed_data = fgsm_attack(images, epsilon, data_grad)
-
-        # 重新分类扰动后的图像
-        output = model(perturbed_data)
-        final_pred = output.max(1, keepdim=True)[1]
-
-        # if final_pred.item() == target_label.item() and labels != 7:
-        if final_pred.item() == target_label.item():
-            if labels != 7:
-                label_not_7 += 1
-            successful_samples.append((images, labels, perturbed_data, final_pred))
-
-        attempts += 1
+    successful_samples, attempts = white_attack(model, data_loader, target_classes, iterations)
 
     attack_success_rate = 100 * len(successful_samples) / attempts
     print(
-        f'Attack Success Rate: {attack_success_rate}%, 不是第七类的数量: {label_not_7}, 总攻击成功数量: {len(successful_samples)}')
+        f'Attack Success Rate: {attack_success_rate}%, 总攻击样本数: {attempts}, 总攻击成功数量: {len(successful_samples)}')
 
-    filter_samples = [sample for sample in successful_samples if sample[1] != 7]
-    if show_all_kind or label_not_7 <= 5:
-        filter_samples = successful_samples
-    selected_samples = random.sample(filter_samples, min(10, len(filter_samples)))
-    original_images, original_labels, perturbed_images, new_labels = zip(
-        *[(x[0], x[1], x[2], x[3]) for x in selected_samples])
+    select_10_samples_and_save(successful_samples,
+                               f'result/test-{dataset_type}-result/result-iteration-{iterations}-{attack_success_rate}%.png')
 
-    # 绘制并保存图像
-    plot_images(original_images, original_labels, perturbed_images, new_labels,
-                f'result/test-{dataset_type}-result/result-{epsilon}-{attack_success_rate}%.png')
-
-    # 提取数据
-    original_images, original_labels, perturbed_images, perturbed_labels = zip(
-        *[(x[0], x[1], x[2], x[3]) for x in successful_samples])
-
-    # 将数据转换为numpy数组
-    original_images_np = np.array([img.cpu().detach().numpy() for img in original_images])
-    original_labels_np = np.array([lbl.cpu().detach().numpy() for lbl in original_labels])
-    perturbed_images_np = np.array([pimg.cpu().detach().numpy() for pimg in perturbed_images])
-    perturbed_labels_np = np.array([plbl.cpu().detach().numpy() for plbl in perturbed_labels])
-
-    # 保存到.npy文件
-    np.savez(f'result/test-{dataset_type}-result/successful_attack_samples-{epsilon}-{len(successful_samples)}.npz',
-             original_images=original_images_np,
-             original_labels=original_labels_np,
-             perturbed_images=perturbed_images_np,
-             perturbed_labels=perturbed_labels_np)
+    save_attack_success_dataset(successful_samples,
+                                f'result/test-{dataset_type}-result/successful_attack_sample-iteration-{iterations}-{len(successful_samples)}.npz')

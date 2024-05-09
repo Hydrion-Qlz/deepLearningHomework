@@ -23,7 +23,7 @@ def test_model(test_loader, device):
 
 if __name__ == '__main__':
     model = SimpleCNN()  # 创建模型实例
-    model.load_state_dict(torch.load('./model/model_params.pth'))  # 加载保存的模型参数
+    model.load_state_dict(torch.load('model/model_params-91.56%.pth'))  # 加载保存的模型参数
 
     transform = transforms.Compose([
         transforms.ToTensor(),

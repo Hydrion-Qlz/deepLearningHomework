@@ -23,33 +23,6 @@ def load_data(filepath):
     return images, labels
 
 
-def get_correct_test_loader(model, test_dataset):
-    test_loader = DataLoader(test_dataset, batch_size=1, shuffle=True)
-
-    correct_images = []
-    model.eval()
-    correct = 0
-    total = 0
-    with torch.no_grad():
-        for images, labels in test_loader:
-            images, labels = images.to(device), labels.to(device)
-            outputs = model(images)
-            _, predicted = torch.max(outputs.data, 1)
-            total += 1
-            if predicted.item() == labels:
-                correct += 1
-                correct_images.append((images, labels))
-
-    print(f"测试数据集总共{total}张图片, 其中预测正确的图片有{correct}张")
-    correct_images = [(image.squeeze(0), label) for image, label in correct_images]
-    images, labels = zip(*correct_images)
-    np.savez(f"data/attack_image_10k_{len(images)}.npz", images=images, labels=labels)
-
-    correct_dataset = torch.utils.data.TensorDataset(torch.stack(images), torch.tensor(labels))
-    correct_loader = DataLoader(correct_dataset, batch_size=1, shuffle=True)
-    return correct_loader
-
-
 def plot_images(original_images, original_labels, perturbed_images, new_labels, file_path):
     plt.figure(figsize=(len(original_images), 2))
     num_images = len(original_images)
@@ -139,7 +112,7 @@ if __name__ == '__main__':
     show_all_kind = False
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = SimpleCNN()
-    model.load_state_dict(torch.load('./model/model_params.pth'))
+    model.load_state_dict(torch.load('model/model_params-91.56%.pth'))
 
     transform = transforms.Compose([
         transforms.ToTensor(),
@@ -152,10 +125,9 @@ if __name__ == '__main__':
         dataset = CustomDataset(images, labels, transform=transform)
 
     data_loader = DataLoader(dataset, batch_size=1, shuffle=True)
-    # test_loader = get_correct_test_loader(model, dataset)
 
     target_classes = {0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 0}
-    iterations = 30
+    iterations = 3
 
     successful_samples, attempts = white_attack(model, data_loader, target_classes, iterations)
 

@@ -65,4 +65,4 @@ if __name__ == '__main__':
     train_model(15, 30, model, train_loader, device)
     accuracy = test_model(test_loader, device)
     print(f'Accuracy: {accuracy}%')
-    torch.save(model.state_dict(), './model/model_params.pth')
+    torch.save(model.state_dict(), f'./model/model_params-{accuracy}%.pth')

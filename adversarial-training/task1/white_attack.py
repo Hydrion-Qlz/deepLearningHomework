@@ -128,7 +128,6 @@ def white_attack(model, data_loader, target_classes, iterations):
 
         # 判断是否攻击成功
         if attack_success:
-            # perturbed_data = image.detach().cpu().numpy()
             successful_samples.append((origin_image, label, image, target_label))
 
         attempts += 1
@@ -136,7 +135,7 @@ def white_attack(model, data_loader, target_classes, iterations):
 
 
 if __name__ == '__main__':
-    dataset_type = "10k"
+    dataset_type = "1k"
     show_all_kind = False
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = SimpleCNN()
@@ -156,13 +155,16 @@ if __name__ == '__main__':
     # test_loader = get_correct_test_loader(model, dataset)
 
     target_classes = {0: 1, 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 0}
-    iterations = 5
+    iterations = 30
 
     successful_samples, attempts = white_attack(model, data_loader, target_classes, iterations)
 
     attack_success_rate = 100 * len(successful_samples) / attempts
     print(
-        f'Attack Success Rate: {attack_success_rate}%, 总攻击样本数: {attempts}, 总攻击成功数量: {len(successful_samples)}')
+        f'Attack Success Rate: {attack_success_rate}%, '
+        f'总攻击样本数: {attempts}, '
+        f'总攻击成功数量: {len(successful_samples)}'
+    )
 
     select_10_samples_and_save(successful_samples,
                                f'result/test-{dataset_type}-result/result-iteration-{iterations}-{attack_success_rate}%.png')

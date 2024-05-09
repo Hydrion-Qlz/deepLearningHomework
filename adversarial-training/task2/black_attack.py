@@ -53,7 +53,7 @@ def black_attack(black_model, data):
 
 
 if __name__ == '__main__':
-    data = load_data('data/black_attack_data_79.npz')
+    data = load_data('data/black_attack_data_896.npz')
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     black_model = CNN().to(device)
     black_model.load_state_dict(torch.load("model/cnn.ckpt"))

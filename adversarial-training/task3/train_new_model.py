@@ -61,7 +61,7 @@ def test_model(test_loader, device):
 
 
 def load_dataset(transform):
-    data = np.load("data/successful_attack_samples-0.0001-770.npz")
+    data = np.load("data/attack_image_5000.npz")
     images = data['perturbed_images'].reshape(-1, 28, 28)
     labels = data['original_labels'].reshape(-1)
     attack_dataset = CustomDataset(images, labels, transform)
@@ -95,4 +95,4 @@ if __name__ == '__main__':
     accuracy = test_model(test_loader, device)
     print(f'Accuracy in test dataset: {accuracy}%')
 
-    torch.save(model.state_dict(), './model/model_params_with_attack.pth')
+    torch.save(model.state_dict(), f'model/model_params_with_attack_{accuracy}%.pth')

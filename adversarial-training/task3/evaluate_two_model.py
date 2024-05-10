@@ -6,9 +6,11 @@
 5. 在新旧模型上分别进行黑盒攻击，对比准确率
 """
 import pickle
+import random
 
 import numpy as np
 import torch
+from matplotlib import pyplot as plt
 from torch import nn
 from torch.utils.data import DataLoader
 from torchvision import datasets
@@ -19,6 +21,33 @@ from task3.model.custom_dataset import CustomDataset
 from task3.model.model import SimpleCNN
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+def select_10_samples_and_save(successful_samples, file_path):
+    selected_samples = random.sample(successful_samples, min(10, len(successful_samples)))
+    original_images, original_labels, perturbed_images, new_labels = zip(
+        *[(x[0], x[1], x[2], x[3]) for x in selected_samples])
+
+    plot_images(original_images, original_labels, perturbed_images, new_labels, file_path)
+
+
+def plot_images(original_images, original_labels, perturbed_images, new_labels, file_path):
+    plt.figure(figsize=(len(original_images), 2))
+    num_images = len(original_images)
+
+    for i in range(num_images):
+        plt.subplot(2, num_images, i + 1)
+        plt.imshow(original_images[i].squeeze().cpu().detach().numpy(), cmap='gray')
+        plt.title(f"Origin: {original_labels[i].item()}")
+        plt.axis('off')
+
+        plt.subplot(2, num_images, num_images + i + 1)
+        plt.imshow(perturbed_images[i].squeeze().cpu().detach().numpy(), cmap='gray')
+        plt.title(f"Attack: {new_labels[i].item()}")
+        plt.axis('off')
+
+    plt.tight_layout()
+    plt.savefig(file_path)
 
 
 def test_model_accuracy_on_test_dataset(model, test_loader):
@@ -92,10 +121,14 @@ def white_attack(model, data_loader):
 def get_white_attack_success_rate(model, data_loader):
     successful_samples, attempts = white_attack(model, data_loader)
     attack_success_rate = 100 * len(successful_samples) / attempts
+
+    select_10_samples_and_save(successful_samples,
+                               f'result/white-attack-{attack_success_rate}%.png')
+
     return attack_success_rate
 
 
-def load_black_attack_data(file_name):
+def load_black_attack_data():
     # load 1k dataset
     with open('data/correct_1k.pkl', 'rb') as file:
         data = pickle.load(file)
@@ -110,12 +143,6 @@ def load_black_attack_data(file_name):
     dataset = CustomDataset(images, labels, transform=transform)
     data_loader = DataLoader(dataset, batch_size=1, shuffle=True)
     return data_loader
-    # data = np.load(file_name)
-    # original_images = data['original_images']
-    # original_labels = data['original_labels']
-    # perturbed_images = data['perturbed_images']
-    # perturbed_labels = data['perturbed_labels']
-    # return original_images, original_labels, perturbed_images, perturbed_labels
 
 
 def black_attack(model, data):
@@ -140,6 +167,8 @@ def get_black_attack_rate(model, data):
     # black attack
     attack_success_list = black_attack(model, successful_white_attack_samples)
     attack_success_rate = len(attack_success_list) / len(data) * 100
+    select_10_samples_and_save(attack_success_list,
+                               f'result/black-attack-{attack_success_rate}%.png')
     return attack_success_rate
 
 
@@ -186,7 +215,7 @@ if __name__ == '__main__':
                    "attack success rate using white attack")
 
     # 测试两个模型在黑盒攻击上的成功率
-    black_attack_data = load_black_attack_data("data/black_attack_data_896.npz")
+    black_attack_data = load_black_attack_data()
     test_two_model(get_black_attack_rate,
                    model_with_attack,
                    model_without_attack,

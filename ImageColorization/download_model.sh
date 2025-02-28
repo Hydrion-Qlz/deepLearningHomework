@@ -1,0 +1,1 @@
+python code/hf_download.py --model rsortino/ColorizeNet --save_dir ./hf_hub

@@ -1,0 +1,1 @@
+nohup python train.py --weights weights/yolov5m.pt --cfg models/yolov5m.yaml --data data/SVHN.yaml --epochs 100 --cache --device 0,1,2,4  --workers 4  --save-period 5 --batch-size 64 &

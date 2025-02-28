@@ -1,0 +1,1 @@
+python hf_download.py --model prajjwal1/bert-tiny --save_dir ./hf_hub

@@ -1,0 +1,16 @@
+Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
+============================== Evaluate on Base Model ==============================
+Evaluating on Base Model: 100%|██████████| 250/250 [03:53<00:00,  1.07it/s]
+Validation Exact Match: 0.0000, Validation BLEU: 0.0048
+
+Evaluating on Base Model: 100%|██████████| 250/250 [03:49<00:00,  1.09it/s]
+Test Exact Match: 0.0000, Test BLEU: 0.0050
+
+============================== Evaluate on Finetune Model ==============================
+Evaluating on Finetune Model: 100%|██████████| 250/250 [03:00<00:00,  1.39it/s]
+Validation Exact Match: 0.0565, Validation BLEU: 0.1065
+
+Evaluating on Finetune Model: 100%|██████████| 250/250 [03:12<00:00,  1.30it/s]
+Test Exact Match: 0.0815, Test BLEU: 0.1273
+
+

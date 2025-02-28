@@ -1,0 +1,1 @@
+python detect.py --weights runs/train/exp/weights/best.pt --source /data/zcd/hj/houseNumberRecoginzation/final/data/test  --save-txt --device 0,1  --save-conf --save-csv --name test-result --exist-ok
